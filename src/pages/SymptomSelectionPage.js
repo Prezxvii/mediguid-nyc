@@ -17,7 +17,13 @@ function SymptomSelectionPage() {
   useEffect(() => {
     const fetchSymptoms = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/symptoms');
+        // --- FIX 1: Use process.env.REACT_APP_BACKEND_URL ---
+        const backendUrl = process.env.REACT_APP_BACKEND_URL;
+        if (!backendUrl) {
+          throw new Error("REACT_APP_BACKEND_URL is not defined in SymptomSelectionPage for fetching symptoms.");
+        }
+        const response = await axios.get(`${backendUrl}/api/symptoms`);
+        // --- END FIX 1 ---
         setSymptoms(response.data);
         setLoadingSymptoms(false);
       } catch (err) {
@@ -50,9 +56,15 @@ function SymptomSelectionPage() {
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/diagnose', {
+      // --- FIX 2: Use process.env.REACT_APP_BACKEND_URL ---
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      if (!backendUrl) {
+          throw new Error("REACT_APP_BACKEND_URL is not defined in SymptomSelectionPage for diagnosis.");
+      }
+      const response = await axios.post(`${backendUrl}/api/diagnose`, {
         selectedSymptomIds: selectedSymptomIds,
       });
+      // --- END FIX 2 ---
 
       navigate('/results', { state: { diagnosisResult: response.data } });
 
@@ -109,7 +121,7 @@ function SymptomSelectionPage() {
               boxShadow: '0px 4px 15px rgba(0,0,0,0.05)'
             }}
           >
-            {symptoms.map((symptom) => ( // 'symptom' is the variable holding the current symptom object
+            {symptoms.map((symptom) => (
               <Chip
                 key={symptom.id}
                 label={symptom.name}
@@ -118,7 +130,6 @@ function SymptomSelectionPage() {
                 color={selectedSymptomIds.includes(symptom.id) ? 'primary' : 'default'}
                 variant={selectedSymptomIds.includes(symptom.id) ? 'filled' : 'outlined'}
                 sx={{
-                  // FIX: Changed 'symptomId' to 'symptom.id' here
                   fontWeight: selectedSymptomIds.includes(symptom.id) ? 'bold' : 'normal',
                   fontSize: '1rem',
                   p: '10px 15px',
