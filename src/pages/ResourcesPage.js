@@ -19,7 +19,14 @@ function ResourcesPage() {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/resources');
+        // --- FIX IS HERE: Use process.env.REACT_APP_BACKEND_URL ---
+        const backendUrl = process.env.REACT_APP_BACKEND_URL;
+        if (!backendUrl) {
+          throw new Error("REACT_APP_BACKEND_URL is not defined.");
+        }
+        const response = await axios.get(`${backendUrl}/api/resources`);
+        // --- END FIX ---
+
         setResources(response.data);
         setLoading(false);
       } catch (err) {
