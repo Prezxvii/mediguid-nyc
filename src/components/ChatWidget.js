@@ -7,7 +7,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 
 // Helper function to render formatted AI text within the chat bubble
-// Removed direct <p> and <strong> tags and opted for Typography component for consistency
 const renderChatFormattedText = (text) => {
   if (!text) return null;
 
@@ -99,11 +98,17 @@ function ChatWidget() {
     setError(null);
 
     try {
+      // --- FIX IS HERE: Use process.env.REACT_APP_BACKEND_URL ---
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      if (!backendUrl) {
+        throw new Error("REACT_APP_BACKEND_URL is not defined in ChatWidget.");
+      }
       // API call to your backend's /api/diagnose endpoint
-      const apiResponse = await axios.post('http://localhost:5000/api/diagnose', {
+      const apiResponse = await axios.post(`${backendUrl}/api/diagnose`, {
         selectedSymptomIds: [], // Send empty array for symptom IDs for chat flow
         chatInput: userMessage // Pass the user's free text input here
       });
+      // --- END FIX ---
 
       const aiContent = apiResponse.data.aiResponse;
 
